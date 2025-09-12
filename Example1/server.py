@@ -19,11 +19,13 @@ server.serve_forever()
  
 import os
 from http.server import SimpleHTTPRequestHandler, HTTPServer
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
  
 class MyHandle (SimpleHTTPRequestHandler):
     def list_directory(self, path):
         try:
-            f = open(os.path.join(path,'index.html'), 'r')
+            f = open(os.path.join(base_dir, "index.html"), "r", encoding="utf-8")
  
             #Cabeçaho do header
             self.send_response(200)
@@ -40,7 +42,7 @@ class MyHandle (SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/login":
             try:
-                with open(os.path.join(os.getcwd(), "login.html"), "r") as login:
+                with open(os.path.join(base_dir, "login.html"), "r", encoding="utf-8") as login:
                     content = login.read()
                 self.send_response(200)
                 self.send_header("Content-type","text/html")
@@ -51,7 +53,7 @@ class MyHandle (SimpleHTTPRequestHandler):
 
         elif self.path == "/cadastro":
             try:
-                with open(os.path.join(os.getcwd(), "cadastro.html"), "r") as cadastro:
+                with open(os.path.join(base_dir, "cadastro.html"), "r", encoding="utf-8") as cadastro:
                     content = cadastro.read()
                 self.send_response(200)
                 self.send_header("Content-type","text/html")
@@ -62,7 +64,7 @@ class MyHandle (SimpleHTTPRequestHandler):
 
         elif self.path == "/listar_filmes":
             try:
-                with open(os.path.join(os.getcwd(), "listar_filmes.html"), "r") as listar_filmes:
+                with open(os.path.join(base_dir, "listar_filmes.html"), "r", encoding="utf-8") as listar_filmes:
                     content = listar_filmes.read()
                 self.send_response(200)
                 self.send_header("Content-type","text/html")
