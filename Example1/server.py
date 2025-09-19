@@ -1,6 +1,7 @@
 import os
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs
+import json # Para salvar o cadastro dos filmes
 
 class MyHandle(SimpleHTTPRequestHandler):
     def list_directory(self, path):
@@ -32,7 +33,7 @@ class MyHandle(SimpleHTTPRequestHandler):
         # Um dicionário de rodas para encaminhar aos HTMLs específicos.
         routes = {
             "/login": "login.html",
-            "/cadastro": "cadastro.html",
+            "/cadastro_filmes": "cadastro_filmes.html",
             "/listar_filmes": "listar_filmes.html",
         }
 
@@ -72,8 +73,45 @@ class MyHandle(SimpleHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.wfile.write(logou.encode('utf-8'))
+            return # Para encerrar a operação
+        
+         # Cadastrar Filmes
+        elif self.path == '/cadastro_filme':
+            #Tamanho da requisição que está sendo mandada
+            content_length = int(self.headers['Content-length'])
+            body = self.rfile.read(content_length).decode('utf-8')
+            form_data = parse_qs(body)
+
+            titulo = form_data.get('titulo', [""])[0]
+            atores = form_data.get('atores', [""])[0]
+            diretor = form_data.get('diretor', [""])[0]
+            ano = form_data.get('ano', [""])[0]
+            genero = form_data.get('genero', [""])[0]
+            produtora = form_data.get('produtora', [""])[0]
+            sinopse = form_data.get('sinopse', [""])[0]
+
+            filme = {"titulo": titulo, "atores": atores, "diretor": diretor, "ano": ano, "genero": genero, "produtora": produtora, "sinopse": sinopse}
+
+            # Se o arquivo existir, carrega os filmes. Se não, começa com lista vazia.
+            if os.path.exists("filmes.json"):
+                with open("filmes.json", "r", encoding="utf-8") as f:
+                    filmes = json.load(f)
+            else:
+                filmes = []
+
+            filmes.append(filme)
+
+            with open("filmes.json", "w", encoding="utf-8") as f:
+                json.dump(filmes, f, ensure_ascii=False, indent=4)
+
+            
+            self.send_response(303)
+            self.send_header("Location", "/listar_filmes")
+            self.end_headers()
+        
         else:
             super(MyHandle, self).do_POST()
+            return
 
 # Função que cofigura e inicia o servidor.
 def main():
