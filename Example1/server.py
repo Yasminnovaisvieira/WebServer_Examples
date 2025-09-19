@@ -1,5 +1,6 @@
 import os
 from http.server import SimpleHTTPRequestHandler, HTTPServer
+from urllib.parse import parse_qs
 
 class MyHandle(SimpleHTTPRequestHandler):
     def list_directory(self, path):
@@ -41,6 +42,24 @@ class MyHandle(SimpleHTTPRequestHandler):
                 self.send_error(404, "File not found")
         else:
             super().do_GET()
+
+    def do_POST(self):
+        if self.path == '/send_login':
+            #Tamanho da requisição que está sendo mandada
+            content_length = int(self.headers['Content-length'])
+            body = self.rfile.read(content_length).decode('utf-8')
+            form_data = parse_qs(body)
+ 
+            print("Data Form:")
+            print("Email:", form_data.get('email',[""])[0])
+            print("Senha:", form_data.get("senha",[""])[0])
+           
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write("Data Retrieving Sucess!".encode('utf-8'))
+        else:
+            super(MyHandle, self).do_POST()
 
 # Função que cofigura e inicia o servidor.
 def main():
