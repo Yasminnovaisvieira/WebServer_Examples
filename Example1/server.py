@@ -17,6 +17,16 @@ class MyHandle(SimpleHTTPRequestHandler):
         except FileNotFoundError:
             return super().list_directory(path)
 
+    #Verificação simples de usuário logado ou não logado
+    def accont_user(self, login,password):
+        loga = "yasminnovaisvieira@gmail.com"
+        senha = "1234"
+ 
+        if login == loga and senha == password:
+            return "Usuário Logado"
+        else:
+            return "Usuário Não Existe "
+
     # Lida com as requisições do tipo GET.
     def do_GET(self):
         # Um dicionário de rodas para encaminhar aos HTMLs específicos.
@@ -49,6 +59,10 @@ class MyHandle(SimpleHTTPRequestHandler):
             content_length = int(self.headers['Content-length'])
             body = self.rfile.read(content_length).decode('utf-8')
             form_data = parse_qs(body)
+
+            login = form_data.get('email',[""])[0]
+            password = form_data.get('senha',[""])[0]
+            logou = self.accont_user(login, password)
  
             print("Data Form:")
             print("Email:", form_data.get('email',[""])[0])
@@ -57,7 +71,7 @@ class MyHandle(SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write("Data Retrieving Sucess!".encode('utf-8'))
+            self.wfile.write(logou.encode('utf-8'))
         else:
             super(MyHandle, self).do_POST()
 
