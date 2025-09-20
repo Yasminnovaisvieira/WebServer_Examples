@@ -24,12 +24,32 @@ class MyHandle(SimpleHTTPRequestHandler):
         senha = "1234"
  
         if login == loga and senha == password:
-            return "Usuário Logado"
+            # Redireciona para a página de cadastro de filmes
+            self.send_response(303)
+            self.send_header("Location", "/cadastro_filmes")
+            self.end_headers()
         else:
-            return "Usuário Não Existe "
+            self.send_response(200)
+            self.send_header("Content-type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write("Usuário Não Existe")
 
     # Lida com as requisições do tipo GET.
     def do_GET(self):
+        if self.path == '/api/filmes':
+            try:
+                with open("filmes.json", "r", encoding="utf-8") as f:
+                    data = f.read()
+
+            except FileNotFoundError:
+                data = "[]"
+            
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(data.encode("utf-8"))
+            return
+
         # Um dicionário de rodas para encaminhar aos HTMLs específicos.
         routes = {
             "/login": "login.html",

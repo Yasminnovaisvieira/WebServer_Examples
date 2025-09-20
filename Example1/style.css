@@ -3,7 +3,6 @@
 body {
   font-family: "Montserrat", sans-serif;
   color: #000000;
-  background-color: #5c00b3df;
   margin: 0;
   padding: 0;
   display: flex;
@@ -11,6 +10,14 @@ body {
   align-items: center;
   min-height: 100vh;
   box-sizing: border-box;
+}
+
+.formularios {
+  background-color: #5c00b3df;
+}
+
+.listaFilmes {
+  flex-direction: column;
 }
 
 .containerFundo {
@@ -117,4 +124,30 @@ h1 {
 .link:hover {
   color: #4b0091;
   text-decoration: underline;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1.5rem;
+}
+
+th, td {
+  border: 2px solid #5c00b32e;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #5c00b32e;
+  font-weight: 600;
+}
+
+td {
+  color: #000000;
+  font-weight: 500;
+}
+
+#tituloLista {
+  font-size: 3rem;
 }

@@ -7,5 +7,14 @@
         "genero": "Animação",
         "produtora": "Disney",
         "sinopse": "Rato do esgoto que decide que seu sonho é ser um grande cozinheiro."
+    },
+    {
+        "titulo": "Mufasa",
+        "atores": "Mufasa e Scar",
+        "diretor": "Yasmin",
+        "ano": "2024",
+        "genero": "Aventura",
+        "produtora": "Disney",
+        "sinopse": "História do leão perdido que desde que nasceu tinha potencial para ser um grande rei e sonhava com um lugar onde as criaturas viviam em harmonia e nas melhores condições."
     }
 ]
