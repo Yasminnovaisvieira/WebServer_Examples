@@ -55,6 +55,7 @@ class MyHandle(SimpleHTTPRequestHandler):
             "/login": "login.html",
             "/cadastro_filmes": "cadastro_filmes.html",
             "/listar_filmes": "listar_filmes.html",
+            "/editar_filme": "editar_filme.html",
         }
 
         # Verifica se o caminho da requisição está presente no dicionário de rotas.
@@ -129,6 +130,62 @@ class MyHandle(SimpleHTTPRequestHandler):
             self.send_header("Location", "/listar_filmes")
             self.end_headers()
         
+        # Deletar Filme
+        elif self.path == '/delete_filme':
+            content_length = int(self.headers['Content-length'])
+            body = self.rfile.read(content_length).decode('utf-8')
+            form_data = parse_qs(body)
+
+            titulo = form_data.get('titulo', [""])[0]
+
+            try:
+                with open("filmes.json", "r", encoding="utf-8") as f:
+                    filmes = json.load(f)
+            except FileNotFoundError:
+                filmes = []
+
+            filmes = [f for f in filmes if f['titulo'] != titulo]
+
+            with open("filmes.json", "w", encoding="utf-8") as f:
+                json.dump(filmes, f, ensure_ascii=False, indent=4)
+
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'Filme deletado')
+            return
+
+        # Editar Filme
+        elif self.path == '/edit_filme':
+            content_length = int(self.headers['Content-length'])
+            body = self.rfile.read(content_length).decode('utf-8')
+            form_data = parse_qs(body)
+
+            titulo_antigo = form_data.get('titulo_antigo', [""])[0]
+            novo_filme = {
+                "titulo": form_data.get('titulo', [""])[0],
+                "atores": form_data.get('atores', [""])[0],
+                "diretor": form_data.get('diretor', [""])[0],
+                "ano": form_data.get('ano', [""])[0],
+                "genero": form_data.get('genero', [""])[0],
+                "produtora": form_data.get('produtora', [""])[0],
+                "sinopse": form_data.get('sinopse', [""])[0],
+            }
+
+            try:
+                with open("filmes.json", "r", encoding="utf-8") as f:
+                    filmes = json.load(f)
+            except FileNotFoundError:
+                filmes = []
+
+            filmes = [novo_filme if f['titulo'] == titulo_antigo else f for f in filmes]
+
+            with open("filmes.json", "w", encoding="utf-8") as f:
+                json.dump(filmes, f, ensure_ascii=False, indent=4)
+
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'Filme editado')
+            return
         else:
             super(MyHandle, self).do_POST()
             return
