@@ -7,7 +7,8 @@ import mysql.connector
 mydb = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "senai"
+    password = "senai",
+    database = "locadora" # Database que vai puxar os dados
 )
 
 class MyHandle(SimpleHTTPRequestHandler):
@@ -52,14 +53,12 @@ class MyHandle(SimpleHTTPRequestHandler):
         path = parsed_path.path
 
         if self.path == '/api/filmes':
-            self.loadFilminhos()
-            try:
-                with open("filmes.json", "r", encoding="utf-8") as f:
-                    data = f.read()
+            cursor = mydb.cursor(dictionary=True) # Retorna dict em vez de tupla
+            cursor.execute("SELECT * FROM filme")
+            result = cursor.fetchall()
 
-            except FileNotFoundError:
-                data = "[]"
-            
+            data = json.dumps(result, ensure_ascii=False) # Converte o resultado em JSON
+
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.end_headers()

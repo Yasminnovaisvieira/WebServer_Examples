@@ -7,7 +7,8 @@ import mysql.connector
 mydb = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "senai"
+    password = "senai",
+    database = "locadora" # Database que vai puxar os dados
 )
 
 class MyHandle(SimpleHTTPRequestHandler):
@@ -51,21 +52,43 @@ class MyHandle(SimpleHTTPRequestHandler):
         parsed_path = urlparse(self.path)
         path = parsed_path.path
 
+        # ================================================
+        # ROTA API FILMES -> agora puxa direto do MySQL
+        # ================================================
         if self.path == '/api/filmes':
-            self.loadFilminhos()
             try:
-                with open("filmes.json", "r", encoding="utf-8") as f:
-                    data = f.read()
+                cursor = mydb.cursor(dictionary=True)
+                cursor.execute("""
+                    SELECT 
+                        id_filme,
+                        titulo,
+                        autor AS atores,   -- renomeia 'autor' para 'atores' pro front entender
+                        diretor,
+                        ano,
+                        genero,
+                        produtora,
+                        sinopse
+                    FROM filme
+                """)
+                filmes = cursor.fetchall()
 
-            except FileNotFoundError:
-                data = "[]"
-            
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(data.encode("utf-8"))
+                if not filmes:
+                    filmes = []
+
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps(filmes, ensure_ascii=False).encode("utf-8"))
+            except mysql.connector.Error as err:
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(err)}).encode("utf-8"))
             return
         
+        # ================================================
+        # ROTA EDITAR FILME (mantida, mas ainda usa JSON)
+        # ================================================
         if path == '/editar_filme':
             query_params = parse_qs(parsed_path.query)
             titulo_para_editar = query_params.get('titulo', [None])[0]
@@ -111,7 +134,7 @@ class MyHandle(SimpleHTTPRequestHandler):
                 self.send_error(404, "Arquivo de filmes ou template de edição não encontrado")
             return
 
-        # Um dicionário de rodas para encaminhar aos HTMLs específicos.
+        # Um dicionário de rotas para encaminhar aos HTMLs específicos.
         routes = {
             "/login": "login.html",
             "/cadastro_filmes": "cadastro_filmes.html",
@@ -158,8 +181,7 @@ class MyHandle(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write("Usuário ou senha inválidos".encode('utf-8'))
             return
-        
-         # Cadastrar Filmes
+
         elif self.path == '/cadastro_filme':
             #Tamanho da requisição que está sendo mandada
             content_length = int(self.headers['Content-length'])
@@ -174,81 +196,21 @@ class MyHandle(SimpleHTTPRequestHandler):
             produtora = form_data.get('produtora', [""])[0]
             sinopse = form_data.get('sinopse', [""])[0]
 
-            filme = {"titulo": titulo, "atores": atores, "diretor": diretor, "ano": ano, "genero": genero, "produtora": produtora, "sinopse": sinopse}
-
-            # Se o arquivo existir, carrega os filmes. Se não, começa com lista vazia.
-            if os.path.exists("filmes.json"):
-                with open("filmes.json", "r", encoding="utf-8") as f:
-                    filmes = json.load(f)
-            else:
-                filmes = []
-
-            filmes.append(filme)
-
-            with open("filmes.json", "w", encoding="utf-8") as f:
-                json.dump(filmes, f, ensure_ascii=False, indent=4)
-
+            # ALTERADO: grava no banco MySQL em vez de JSON
+            cursor = mydb.cursor()
+            sql = """
+                INSERT INTO filme (titulo, autor, diretor, ano, genero, produtora, sinopse)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            val = (titulo, atores, diretor, ano, genero, produtora, sinopse)
+            cursor.execute(sql, val)
+            mydb.commit()
             
             self.send_response(303)
             self.send_header("Location", "/listar_filmes")
             self.end_headers()
-        
-        # Deletar Filme
-        elif self.path == '/delete_filme':
-            content_length = int(self.headers['Content-length'])
-            body = self.rfile.read(content_length).decode('utf-8')
-            form_data = parse_qs(body)
-
-            titulo = form_data.get('titulo', [""])[0]
-
-            try:
-                with open("filmes.json", "r", encoding="utf-8") as f:
-                    filmes = json.load(f)
-            except FileNotFoundError:
-                filmes = []
-
-            filmes = [f for f in filmes if f['titulo'] != titulo]
-
-            with open("filmes.json", "w", encoding="utf-8") as f:
-                json.dump(filmes, f, ensure_ascii=False, indent=4)
-
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b'Filme deletado')
             return
 
-        # Editar Filme
-        elif self.path == '/editar_filme':
-            content_length = int(self.headers['Content-length'])
-            body = self.rfile.read(content_length).decode('utf-8')
-            form_data = parse_qs(body)
-            titulo_antigo = form_data.get('titulo_antigo', [""])[0]
-
-            novo_filme = {
-                "titulo": form_data.get('titulo', [""])[0],
-                "atores": form_data.get('atores', [""])[0],
-                "diretor": form_data.get('diretor', [""])[0],
-                "ano": form_data.get('ano', [""])[0],
-                "genero": form_data.get('genero', [""])[0],
-                "produtora": form_data.get('produtora', [""])[0],
-                "sinopse": form_data.get('sinopse', [""])[0],
-            }
-
-            try:
-                with open("filmes.json", "r", encoding="utf-8") as f:
-                    filmes = json.load(f)
-                filmes = [novo_filme if f['titulo'] == titulo_antigo else f for f in filmes]
-                with open("filmes.json", "w", encoding="utf-8") as f:
-                    json.dump(filmes, f, ensure_ascii=False, indent=4)
-                
-                # Redireciona para a lista após editar
-                self.send_response(303)
-                self.send_header("Location", "/listar_filmes")
-                self.end_headers()
-            except FileNotFoundError:
-                self.send_error(404, "Arquivo de filmes não encontrado")
-            return
-        
         else:
             super(MyHandle, self).do_POST()
             return
