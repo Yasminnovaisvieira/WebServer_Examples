@@ -31,7 +31,7 @@ class MyHandle(SimpleHTTPRequestHandler):
         cursor.execute("SELECT * FROM locadora.diretor")
         result = cursor.fetchall()
 
-        print("******************/n", result)
+        print("******************\n", result)
 
         for res in result:
             id_diretor = res[0]
@@ -52,24 +52,10 @@ class MyHandle(SimpleHTTPRequestHandler):
         parsed_path = urlparse(self.path)
         path = parsed_path.path
 
-        # ================================================
-        # ROTA API FILMES -> agora puxa direto do MySQL
-        # ================================================
         if self.path == '/api/filmes':
             try:
                 cursor = mydb.cursor(dictionary=True)
-                cursor.execute("""
-                    SELECT 
-                        id_filme,
-                        titulo,
-                        autor AS atores,   -- renomeia 'autor' para 'atores' pro front entender
-                        diretor,
-                        ano,
-                        genero,
-                        produtora,
-                        sinopse
-                    FROM filme
-                """)
+                cursor.execute(""" SELECT * FROM filme """)
                 filmes = cursor.fetchall()
 
                 if not filmes:
@@ -86,9 +72,6 @@ class MyHandle(SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": str(err)}).encode("utf-8"))
             return
         
-        # ================================================
-        # ROTA EDITAR FILME (mantida, mas ainda usa JSON)
-        # ================================================
         if path == '/editar_filme':
             query_params = parse_qs(parsed_path.query)
             titulo_para_editar = query_params.get('titulo', [None])[0]
@@ -199,7 +182,7 @@ class MyHandle(SimpleHTTPRequestHandler):
             # ALTERADO: grava no banco MySQL em vez de JSON
             cursor = mydb.cursor()
             sql = """
-                INSERT INTO filme (titulo, autor, diretor, ano, genero, produtora, sinopse)
+                INSERT INTO filme (titulo, atores, diretor, ano, genero, produtora, sinopse)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
             val = (titulo, atores, diretor, ano, genero, produtora, sinopse)
