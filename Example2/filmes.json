@@ -1,0 +1,20 @@
+[
+    {
+        "titulo": "Mufasa",
+        "atores": "Mufasa e Scar",
+        "diretor": "Yasmin",
+        "ano": "2024",
+        "genero": "Aventura",
+        "produtora": "Disney",
+        "sinopse": "História do leão perdido que desde que nasceu tinha potencial para ser um grande rei e sonhava com um lugar onde as criaturas viviam em harmonia e nas melhores condições."
+    },
+    {
+        "titulo": "Ratatoullie",
+        "atores": "Remi",
+        "diretor": "Yasmin",
+        "ano": "2010",
+        "genero": "Animação",
+        "produtora": "Disney",
+        "sinopse": "Rato que sonha em ser um grande cozinheiro."
+    }
+]

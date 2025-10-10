@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cadastro de Filmes</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body class="formularios">
+        <main class="containerFundo">
+            <h1>Cadastro de Filmes</h1>
+            <form class="formCadastro" action="/cadastro_filme" method="post">
+                <div class="grupoFormulario cadastro">
+                    <label for="titulo">Título do Filme</label>
+                    <input type="text" id="titulo" name="titulo" required />
+                </div>
+
+                <div class="grupoFormulario cadastro">
+                    <label for="atores">Atores</label>
+                    <input type="text" id="atores" name="atores" />
+                </div>
+
+                <div class="grupoFormulario cadastro">
+                    <label for="diretores">Diretor</label>
+                    <input type="text" id="diretor" name="diretor" />
+                </div>
+
+                <div class="grupoFormulario cadastro">
+                    <label for="ano">Ano</label>
+                    <input
+                        type="number"
+                        id="ano"
+                        name="ano"
+                        min="1900"
+                        max="2100"
+                    />
+                </div>
+
+                <div class="grupoFormulario cadastro">
+                    <label for="genero">Gênero</label>
+                    <input type="text" id="genero" name="genero" />
+                </div>
+
+                <div class="grupoFormulario cadastro">
+                    <label for="produtora">Produtora</label>
+                    <input type="text" id="produtora" name="produtora" />
+                </div>
+
+                <div class="grupoFormulario cadastro larguraTotal">
+                    <label for="sinopse">Sinopse</label>
+                    <textarea id="sinopse" name="sinopse" rows="4"></textarea>
+                </div>
+
+                <button type="submit" class="botao larguraTotal">
+                    Cadastrar
+                </button>
+            </form>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Editar Filme</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body class="formularios">
+        <div class="containerFundo">
+            <h1>Editar Filme</h1>
+
+            <form
+                id="formEditar"
+                class="formCadastro"
+                method="POST"
+                action="/editar_filme"
+            >
+                <div class="cadastro">
+                    <div class="grupoFormulario">
+                        <label>Título:</label>
+                        <input type="text" name="titulo" required />
+                    </div>
+                </div>
+
+                <div class="cadastro">
+                    <div class="grupoFormulario">
+                        <label>Atores:</label>
+                        <input type="text" name="atores" />
+                    </div>
+                </div>
+
+                <div class="cadastro">
+                    <div class="grupoFormulario">
+                        <label>Diretor:</label>
+                        <input type="text" name="diretor" />
+                    </div>
+                </div>
+
+                <div class="cadastro">
+                    <div class="grupoFormulario">
+                        <label>Ano:</label>
+                        <input type="number" name="ano" />
+                    </div>
+                </div>
+
+                <div class="cadastro">
+                    <div class="grupoFormulario">
+                        <label>Gênero:</label>
+                        <input type="text" name="genero" />
+                    </div>
+                </div>
+
+                <div class="cadastro">
+                    <div class="grupoFormulario">
+                        <label>Produtora:</label>
+                        <input type="text" name="produtora" />
+                    </div>
+                </div>
+
+                <div class="cadastro larguraTotal">
+                    <div class="grupoFormulario">
+                        <label>Sinopse:</label>
+                        <textarea name="sinopse"></textarea>
+                    </div>
+                </div>
+
+                <div class="cadastro larguraTotal">
+                    <button type="submit" class="botao">Salvar</button>
+                </div>
+            </form>
+        </div>
+        <script src="editar.js"></script>
+    </body>
+</html>
